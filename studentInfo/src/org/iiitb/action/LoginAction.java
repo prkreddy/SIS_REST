@@ -11,8 +11,8 @@ import javax.naming.NamingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.interceptor.SessionAware;
-import org.iiitb.action.dao.LayoutDAO;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+//import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.model.User;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
@@ -24,7 +24,7 @@ public class LoginAction extends ActionSupport implements SessionAware
 
 	private String username;
 
-	private LayoutDAO layoutDAO = new LayoutDAOImpl();
+	//private LayoutDAO layoutDAO = new LayoutDAOImpl();
 
 	public String getUsername()
 	{
@@ -75,14 +75,14 @@ public class LoginAction extends ActionSupport implements SessionAware
 					return "admin";
 				}
 
-				Connection connection = ConnectionPool.getConnection();
-				session.put(
-						Constants.LAST_LOGGED_ON,
-						layoutDAO.getLastLoggedOn(connection,
-								Integer.parseInt(newUser.getUserId())));
-				layoutDAO.setLastLoggedOn(connection,
-						Integer.parseInt(newUser.getUserId()));
-				ConnectionPool.freeConnection(connection);
+				//Connection connection = ConnectionPool.getConnection();
+				//session.put(
+						//Constants.LAST_LOGGED_ON,
+						//layoutDAO.getLastLoggedOn(connection,
+							//	Integer.parseInt(newUser.getUserId())));
+				//layoutDAO.setLastLoggedOn(connection,
+					//	Integer.parseInt(newUser.getUserId()));
+				//ConnectionPool.freeConnection(connection);
 
 				return SUCCESS;
 			}

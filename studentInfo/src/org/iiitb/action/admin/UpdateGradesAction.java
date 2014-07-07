@@ -7,10 +7,10 @@ import java.util.Map;
 
 import org.apache.struts2.interceptor.SessionAware;
 import org.iiitb.action.dao.CourseDAO;
-import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.LayoutDAO;
 import org.iiitb.action.dao.ResultDAO;
 import org.iiitb.action.dao.impl.CourseDAOImpl;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.action.dao.impl.ResultDAOImpl;
 import org.iiitb.action.dao.impl.SemesterDAOImpl;
 import org.iiitb.action.dao.impl.StudentDAOImpl;

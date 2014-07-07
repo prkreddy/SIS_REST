@@ -1,4 +1,4 @@
-package org.iiitb.action.dao.impl;
+/*package org.iiitb.action.dao.impl;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -64,12 +64,12 @@ public class LayoutDAOImpl implements LayoutDAO
 		return la;
 	}
 
-	/*
+	
 	 * (non-Javadoc)
 	 * 
 	 * @see org.iiitb.action.dao.LayoutDAO#getLastLoggedOn(java.sql.Connection,
 	 * int)
-	 */
+	 
 	@Override
 	public String getLastLoggedOn(Connection connection, int userId)
 			throws SQLException
@@ -101,3 +101,4 @@ public class LayoutDAOImpl implements LayoutDAO
 	}
 
 }
+*/

@@ -1,18 +1,22 @@
 package org.iiitb.action.viewprofile;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
 import org.apache.struts2.interceptor.SessionAware;
-import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.LayoutDAO;
 import org.iiitb.action.dao.MyProfileDAO;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.model.User;
 import org.iiitb.model.layout.AnnouncementsItem;
 import org.iiitb.model.layout.NewsItem;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
+import org.iiitb.util.RestClient;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
@@ -75,7 +79,7 @@ public class MyProfileAction extends ActionSupport implements SessionAware
 
 	private List<NewsItem> allNews;
 	private List<AnnouncementsItem> announcements;
-	private LayoutDAO layoutDAO = new LayoutDAOImpl();
+	//private LayoutDAO layoutDAO = new LayoutDAOImpl();
 	private String lastLoggedOn = "";
 
 	
@@ -110,12 +114,20 @@ public class MyProfileAction extends ActionSupport implements SessionAware
 			rollno = prof.getRollno();
 			interests = prof.getInterests();
 			
-			Connection connection = ConnectionPool.getConnection();
-			allNews = layoutDAO.getAllNews(connection);
-			announcements = layoutDAO.getAnnouncements(connection,
-					Integer.parseInt(user.getUserId()));
+			//Connection connection = ConnectionPool.getConnection();
+			//allNews = layoutDAO.getAllNews(connection);
+			//announcements = layoutDAO.getAnnouncements(connection,
+				//	Integer.parseInt(user.getUserId()));
 			setLastLoggedOn((String) this.session.get(Constants.LAST_LOGGED_ON));
-			ConnectionPool.freeConnection(connection);
+			//ConnectionPool.freeConnection(connection);
+			RestClient rc=new RestClient();
+			Gson gson=new GsonBuilder().create();
+			allNews=new ArrayList<NewsItem>();
+			for(NewsItem ni:gson.fromJson(rc.callGetService("news"), NewsItem[].class))
+				allNews.add(ni);
+			announcements=new ArrayList<AnnouncementsItem>();
+		    for(AnnouncementsItem ai:gson.fromJson(rc.callGetService("announcements/users/"+user.getUserId()), AnnouncementsItem[].class))
+		    	announcements.add(ai);
 			return SUCCESS;
 		} else {
 		  return LOGIN;

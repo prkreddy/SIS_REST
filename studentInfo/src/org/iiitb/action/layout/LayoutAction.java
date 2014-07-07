@@ -13,8 +13,9 @@ import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.SessionAware;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
-import org.iiitb.action.dao.LayoutDAO;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+import org.iiitb.util.RestClient;
+//import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.model.User;
 import org.iiitb.model.layout.*;
 
@@ -37,7 +38,7 @@ public class LayoutAction extends ActionSupport implements SessionAware
 	private List<AnnouncementsItem> announcements;
 	private String lastLoggedOn;
 	
-	private LayoutDAO layoutDAO=new LayoutDAOImpl();
+	//private LayoutDAO layoutDAO=new LayoutDAOImpl();
 	
 	public String execute() throws SQLException
 	{
@@ -45,13 +46,15 @@ public class LayoutAction extends ActionSupport implements SessionAware
 			user = (User)session.get("user");
 		if(user != null)
 		{
-			/*
-			Connection cn=ConnectionPool.getConnection();
-			allNews=layoutDAO.getAllNews(cn);
-			announcements=layoutDAO.getAnnouncements(cn, Integer.parseInt(user.getUserId()));
+			
+			//Connection cn=ConnectionPool.getConnection();
+			//allNews=layoutDAO.getAllNews(cn);
+			//announcements=layoutDAO.getAnnouncements(cn, Integer.parseInt(user.getUserId()));
 			setLastLoggedOn((String) this.session.get(Constants.LAST_LOGGED_ON));
-			ConnectionPool.freeConnection(cn);
-			*/
+			//ConnectionPool.freeConnection(cn);
+			
+			
+			/*
 			Gson gson=new GsonBuilder().create();
 			ClientConfig config = new DefaultClientConfig();
 		    Client client = Client.create(config);
@@ -68,6 +71,16 @@ public class LayoutAction extends ActionSupport implements SessionAware
 		    for(AnnouncementsItem ai:gson.fromJson(
 		    		service.path("rest").path("announcements").path("users").path(user.getUserId()).accept(MediaType.APPLICATION_JSON).get(String.class),
 		    		AnnouncementsItem[].class))
+		    	announcements.add(ai);
+		    */
+			
+			RestClient rc=new RestClient();
+			Gson gson=new GsonBuilder().create();
+			allNews=new ArrayList<NewsItem>();
+			for(NewsItem ni:gson.fromJson(rc.callGetService("news"), NewsItem[].class))
+				allNews.add(ni);
+			announcements=new ArrayList<AnnouncementsItem>();
+		    for(AnnouncementsItem ai:gson.fromJson(rc.callGetService("announcements/users/"+user.getUserId()), AnnouncementsItem[].class))
 		    	announcements.add(ai);
 		}
 		return "success";

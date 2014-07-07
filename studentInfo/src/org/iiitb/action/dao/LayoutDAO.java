@@ -1,4 +1,4 @@
-package org.iiitb.action.dao;
+/*package org.iiitb.action.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,3 +14,4 @@ public interface LayoutDAO
 	public String getLastLoggedOn(Connection connection, int userId) throws SQLException;
 	public void setLastLoggedOn(Connection connection, int userId) throws SQLException;
 }
+*/

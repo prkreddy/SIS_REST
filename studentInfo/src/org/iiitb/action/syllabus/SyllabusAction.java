@@ -9,10 +9,10 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.interceptor.SessionAware;
 import org.iiitb.action.dao.CourseDAO;
-import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.LayoutDAO;
 import org.iiitb.action.dao.SyllabusDAO;
 import org.iiitb.action.dao.impl.CourseDAOImpl;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.action.dao.impl.SyllabusDAOImpl;
 import org.iiitb.action.subjects.SubjectInfo;
 import org.iiitb.model.User;
@@ -20,7 +20,10 @@ import org.iiitb.model.layout.AnnouncementsItem;
 import org.iiitb.model.layout.NewsItem;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
+import org.iiitb.util.RestClient;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.ActionSupport;
 
 public class SyllabusAction extends ActionSupport implements SessionAware{
@@ -39,7 +42,7 @@ public class SyllabusAction extends ActionSupport implements SessionAware{
 	
 
 
-	private LayoutDAO layoutDAO = new LayoutDAOImpl();
+	//private LayoutDAO layoutDAO = new LayoutDAOImpl();
 	private Map<String, Object> session;
   
 	private String lastLoggedOn;
@@ -89,11 +92,19 @@ public class SyllabusAction extends ActionSupport implements SessionAware{
 		User user = (User) session.get("user");
 		Connection connection = ConnectionPool.getConnection();
 		syllabusInfoList = syllabusDAO.getSyllabus(connection, subjectCode);
-		allNews = layoutDAO.getAllNews(connection);
-		announcements = layoutDAO.getAnnouncements(connection,
-        Integer.parseInt(user.getUserId()));
+		//allNews = layoutDAO.getAllNews(connection);
+		//announcements = layoutDAO.getAnnouncements(connection,
+        //Integer.parseInt(user.getUserId()));
 		setLastLoggedOn((String) this.session.get(Constants.LAST_LOGGED_ON));
 		ConnectionPool.freeConnection(connection);
+		RestClient rc=new RestClient();
+		Gson gson=new GsonBuilder().create();
+		allNews=new ArrayList<NewsItem>();
+		for(NewsItem ni:gson.fromJson(rc.callGetService("news"), NewsItem[].class))
+			allNews.add(ni);
+		announcements=new ArrayList<AnnouncementsItem>();
+	    for(AnnouncementsItem ai:gson.fromJson(rc.callGetService("announcements/users/"+user.getUserId()), AnnouncementsItem[].class))
+	    	announcements.add(ai);
 	    return SUCCESS;
 	  }
 	

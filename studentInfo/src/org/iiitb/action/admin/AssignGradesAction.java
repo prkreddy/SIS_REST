@@ -1,16 +1,17 @@
 package org.iiitb.action.admin;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.struts2.interceptor.SessionAware;
 import org.iiitb.action.dao.CourseDAO;
-import org.iiitb.action.dao.LayoutDAO;
+//import org.iiitb.action.dao.LayoutDAO;
 import org.iiitb.action.dao.ResultDAO;
 import org.iiitb.action.dao.impl.CourseDAOImpl;
-import org.iiitb.action.dao.impl.LayoutDAOImpl;
+//import org.iiitb.action.dao.impl.LayoutDAOImpl;
 import org.iiitb.action.dao.impl.ResultDAOImpl;
 import org.iiitb.action.dao.impl.SemesterDAOImpl;
 import org.iiitb.action.dao.impl.StudentDAOImpl;
@@ -22,7 +23,10 @@ import org.iiitb.model.layout.AnnouncementsItem;
 import org.iiitb.model.layout.NewsItem;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
+import org.iiitb.util.RestClient;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**
@@ -50,7 +54,7 @@ public class AssignGradesAction extends ActionSupport implements SessionAware
 
 	private List<NewsItem> allNews;
 	private List<AnnouncementsItem> announcements;
-	private LayoutDAO layoutDAO = new LayoutDAOImpl();
+	//private LayoutDAO layoutDAO = new LayoutDAOImpl();
 	private String lastLoggedOn = "";
 
 	public AssignGradesAction()
@@ -79,11 +83,19 @@ public class AssignGradesAction extends ActionSupport implements SessionAware
 			courseList.addAll(new CourseDAOImpl().getEnrolledCourses(connection, studentDisplayChoice));
 			gradeList.addAll(new ResultDAOImpl().getGrades());
 			
-			allNews = layoutDAO.getAllNews(connection);
-			announcements = layoutDAO.getAnnouncements(connection,
-					Integer.parseInt(loggedInUser.getUserId()));
+			//allNews = layoutDAO.getAllNews(connection);
+			//announcements = layoutDAO.getAnnouncements(connection,
+				//	Integer.parseInt(loggedInUser.getUserId()));
 			setLastLoggedOn((String) this.session.get(Constants.LAST_LOGGED_ON));
-			ConnectionPool.freeConnection(connection);
+			//ConnectionPool.freeConnection(connection);
+			RestClient rc=new RestClient();
+			Gson gson=new GsonBuilder().create();
+			allNews=new ArrayList<NewsItem>();
+			for(NewsItem ni:gson.fromJson(rc.callGetService("news"), NewsItem[].class))
+				allNews.add(ni);
+			announcements=new ArrayList<AnnouncementsItem>();
+		    for(AnnouncementsItem ai:gson.fromJson(rc.callGetService("announcements/users/"+loggedInUser.getUserId()), AnnouncementsItem[].class))
+		    	announcements.add(ai);
 			return SUCCESS;
 		}
 		else
