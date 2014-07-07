@@ -14,7 +14,7 @@ public class RestClient
 
 		Client client = Client.create();
 
-		WebResource webResource = client.resource("http://localhost:8082/sisrest/rest/" + serviceUri);
+		WebResource webResource = client.resource("http://localhost:8080/api.sis/rest/" + serviceUri);
 
 		/*
 		 * String input = "{\"event_name\":\"" + eventname +
@@ -43,7 +43,7 @@ public class RestClient
 
 		Client client = Client.create();
 
-		WebResource webResource = client.resource("http://localhost:8082/sisrest/rest/" + uri);
+		WebResource webResource = client.resource("http://localhost:8080/api.sis/rest/" + uri);
 
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
