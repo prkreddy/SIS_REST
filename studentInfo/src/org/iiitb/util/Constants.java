@@ -18,5 +18,7 @@ public interface Constants
 	String FRIEND = "friend";
 	
 	public String LAST_LOGGED_ON = "date";
+	
+	String REST_SERVER_HOST ="http://localhost:8090/api.sis/rest/";
 
 }
