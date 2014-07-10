@@ -11,19 +11,9 @@ public class RestClient
 
 	public String callPostService(String input, String serviceUri)
 	{
-
 		Client client = Client.create();
 
-		WebResource webResource = client.resource(Constants.REST_SERVER_HOST + serviceUri);
-
-		/*
-		 * String input = "{\"event_name\":\"" + eventname +
-		 * "\",\"event_start_date\":\"" + eventstartdate +
-		 * "\",\"event_end_date\":\"" + eventenddate + "\",\"event_time\":\"" +
-		 * eventtime + "\",\"organiser_id\":\"" + user.getUserId() +
-		 * "\",\"event_type\":\"" + eventType + "\"," + "\"event_duration\":" +
-		 * eventduration + ",\"event_desc\":\"" + eventDescription + "\"}";
-		 */
+		WebResource webResource = client.resource(Constants.REST_SERVER_HOST + serviceUri);		
 
 		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
 
@@ -32,7 +22,6 @@ public class RestClient
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 
-		System.out.println("Output from Server .... \n");
 		String output = response.getEntity(String.class);
 
 		return output;
@@ -52,7 +41,6 @@ public class RestClient
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 
-		System.out.println("Output from Server .... \n");
 		String output = response.getEntity(String.class);
 
 		return output;

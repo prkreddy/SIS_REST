@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.struts2.interceptor.SessionAware;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 //import org.iiitb.action.dao.LayoutDAO;
 import org.iiitb.action.dao.StudentDAO;
 //import org.iiitb.action.dao.impl.LayoutDAOImpl;
@@ -40,7 +43,7 @@ public class MyFriendsAction extends ActionSupport implements SessionAware
 
 	private List<NewsItem> allNews;
 	private List<AnnouncementsItem> announcements;
-	//private LayoutDAO layoutDAO = new LayoutDAOImpl();
+	// private LayoutDAO layoutDAO = new LayoutDAOImpl();
 	private String lastLoggedOn;
 
 	public StudentInfo getMyProfile()
@@ -85,35 +88,37 @@ public class MyFriendsAction extends ActionSupport implements SessionAware
 
 	public String execute() throws SQLException
 	{
+		RestClient restClient = new RestClient();
 
 		User user = (User) session.get("user");
 		if (user != null)
 		{
 
-			StudentDAO studentDao = new StudentDAOImpl();
+			// StudentInfo studentInfo =
+			// studentDao.getStudentByUserId(user.getUserId());
 
-			StudentInfo studentInfo = studentDao.getStudentByUserId(user.getUserId());
+			// rest call start
+			String output = restClient.callGetService("friends/studentid/" + user.getUserId());
+			// rest call end
+
+			StudentInfo studentInfo = getStudentInfo(output);
 
 			if (studentInfo != null)
 			{
 
 				setMyProfile(studentInfo);
 
-				setStudents(studentDao.getFriends(user.getUserId()));
+				setStudents(getListOfStudents(restClient.callGetService("friends/studentfriends/" + user.getUserId())));
 
-				//Connection connection = ConnectionPool.getConnection();
-				//allNews = layoutDAO.getAllNews(connection);
-				//announcements = layoutDAO.getAnnouncements(connection, Integer.parseInt(user.getUserId()));
 				setLastLoggedOn((String) this.session.get(Constants.LAST_LOGGED_ON));
-				//ConnectionPool.freeConnection(connection);
-				RestClient rc=new RestClient();
-				Gson gson=new GsonBuilder().create();
-				allNews=new ArrayList<NewsItem>();
-				for(NewsItem ni:gson.fromJson(rc.callGetService("news"), NewsItem[].class))
+				RestClient rc = new RestClient();
+				Gson gson = new GsonBuilder().create();
+				allNews = new ArrayList<NewsItem>();
+				for (NewsItem ni : gson.fromJson(rc.callGetService("news"), NewsItem[].class))
 					allNews.add(ni);
-				announcements=new ArrayList<AnnouncementsItem>();
-			    for(AnnouncementsItem ai:gson.fromJson(rc.callGetService("announcements/users/"+user.getUserId()), AnnouncementsItem[].class))
-			    	announcements.add(ai);
+				announcements = new ArrayList<AnnouncementsItem>();
+				for (AnnouncementsItem ai : gson.fromJson(rc.callGetService("announcements/users/" + user.getUserId()), AnnouncementsItem[].class))
+					announcements.add(ai);
 			}
 			else
 			{
@@ -140,6 +145,76 @@ public class MyFriendsAction extends ActionSupport implements SessionAware
 	public void setLastLoggedOn(String lastLoggedOn)
 	{
 		this.lastLoggedOn = lastLoggedOn;
+	}
+
+	List<StudentInfo> getListOfStudents(String ouput)
+	{
+		System.out.println("*******************************************************************");
+
+		List<StudentInfo> students = new ArrayList<StudentInfo>();
+
+		try
+		{
+			JSONArray jsonArray = new JSONArray(ouput);
+			JSONObject jsonObject = null;
+
+			for (int i = 0; i < jsonArray.length(); i++)
+			{
+				jsonObject = jsonArray.getJSONObject(i);
+				StudentInfo info = new StudentInfo();
+				info.setStudentId(Integer.parseInt(jsonObject.optString("studentId")));
+
+				info.setDob(jsonObject.optString("dob"));
+
+				info.setRollNo(jsonObject.optString("rollNo"));
+				info.setName(jsonObject.optString("name"));
+				students.add(info);
+
+				System.out.println(jsonObject);
+
+			}
+
+			System.out.println(jsonObject);
+
+		}
+		catch (JSONException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("*******************************************************************");
+		return students;
+	}
+
+	StudentInfo getStudentInfo(String ouput)
+	{
+		System.out.println("*******************************************************************");
+		StudentInfo info = null;
+
+		try
+		{
+			JSONObject jsonObject = new JSONObject(ouput);
+
+			info = new StudentInfo();
+			info.setStudentId(Integer.parseInt(jsonObject.optString("studentId")));
+
+			info.setDob(jsonObject.optString("dob"));
+
+			info.setRollNo(jsonObject.optString("rollNo"));
+			info.setName(jsonObject.optString("name"));
+
+			System.out.println(jsonObject);
+
+		}
+		catch (JSONException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("*******************************************************************");
+		return info;
 	}
 
 }
