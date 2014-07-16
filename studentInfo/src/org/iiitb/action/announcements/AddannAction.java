@@ -6,20 +6,28 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import javax.naming.NamingException;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.interceptor.SessionAware;
+import org.iiitb.model.layout.AnnouncementsItem;
+import org.iiitb.model.layout.Interest;
 import org.iiitb.util.ConnectionPool;
 import org.iiitb.util.Constants;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.ActionSupport;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 
 public class AddannAction extends ActionSupport implements SessionAware
 
 {
 	private String name;
 	private String details;
-	private String interest;
+	private int interest;
 
 	public String getName() {
 		return name;
@@ -50,6 +58,8 @@ public class AddannAction extends ActionSupport implements SessionAware
 
 		PreparedStatement preStmt = null;
 		try {
+			
+			/*
 			String query = "insert into announcement(name,details) values(?,?)";
 
 			preStmt = conn.prepareStatement(query);
@@ -60,7 +70,7 @@ public class AddannAction extends ActionSupport implements SessionAware
 			{
 				String q="insert into announcement_interest(interest_id, announcement_id) values(?, (select max(announcement_id) from announcement));";
 				PreparedStatement p=conn.prepareStatement(q);
-				p.setInt(1, Integer.parseInt(interest.split("[.]")[0]));
+				p.setInt(1, interest);
 				if(p.executeUpdate()>0)
 					ret = SUCCESS;
 				else
@@ -68,7 +78,17 @@ public class AddannAction extends ActionSupport implements SessionAware
 			}
 			else
 				ret = ERROR;
-		} catch (SQLException e) {
+				*/
+			
+			
+			Gson gson=new GsonBuilder().create();
+			Client client = Client.create();
+			WebResource webResource = client.resource("http://localhost:8080/api.sis/rest/announcements/add");
+			webResource.accept(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class, gson.toJson(new AnnouncementsItem(name, details, interest)));
+			ret = SUCCESS;
+			
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
@@ -97,11 +117,11 @@ public class AddannAction extends ActionSupport implements SessionAware
 
 	}
 
-	public String getInterest() {
+	public int getInterest() {
 		return interest;
 	}
 
-	public void setInterest(String interest) {
+	public void setInterest(int interest) {
 		this.interest = interest;
 	}
 }
